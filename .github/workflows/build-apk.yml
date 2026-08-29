@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Android APK Automatically
 
 on:
   workflow_dispatch:
@@ -10,21 +10,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set up Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
 
-      - name: Install dependencies and Capacitor Android
+      - name: Install Project Dependencies & Capacitor
         run: |
           npm install
           npm install @capacitor/core @capacitor/cli @capacitor/android
 
-      - name: Build web app
+      - name: Build Web App (Vite)
         run: npm run build
 
       - name: Set up JDK 17
@@ -33,16 +33,16 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Force Add Android Platform
-        run: npx cap add android --force
+      - name: Initialize Capacitor Android Platform
+        run: npx cap add android || true
 
-      - name: Sync Capacitor Android
+      - name: Sync Capacitor Files
         run: npx cap sync android
 
-      - name: Make Gradle executable
+      - name: Grant Gradle Execution Permission
         run: chmod +x android/gradlew
 
-      - name: Build Debug APK
+      - name: Build APK with Gradle
         working-directory: ./android
         run: ./gradlew assembleDebug
 
